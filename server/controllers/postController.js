@@ -2,6 +2,10 @@ exports.postPage = function(req, res) {
 
 }
 
+exports.addPostPage = function(req, res) {
+    
+}
+
 exports.addPost = function(req, res) {
     
 }
