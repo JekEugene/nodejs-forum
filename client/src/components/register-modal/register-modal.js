@@ -1,5 +1,7 @@
 import React from 'react'
-
+import ReactDOM from 'react-dom'
+import {Redirect} from 'react-router-dom'
+ 
 function RegisterModal(props){
     return(
         <div class="modal" id="register" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -12,21 +14,36 @@ function RegisterModal(props){
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="/register" method="POST">
+                        <form onSubmit={props.registerSubmit}>
                             <div class="form-group">
                                 <label for="name">name</label>
-                                <input type="text" class="form-control" id="name" placeholder="name" />
+                                <input  type="text" 
+                                        className="form-control" 
+                                        id="name" 
+                                        name="nameInput"
+                                        onChange={(e)=>props.handleChange(e)}  
+                                        required/>
                             </div>
                             <div class="form-group">
                                 <label for="email">email</label>
-                                <input type="email" class="form-control" id="email" placeholder="user@gmail.com" />
+                                <input  type="email" 
+                                        class="form-control" 
+                                        id="email" 
+                                        name="emailInput"
+                                        onChange={(e)=>props.handleChange(e)} 
+                                        required/>
                             </div>
                             <div class="form-group">
                                 <label for="password">password</label>
-                                <input type="passworf" class="form-control" id="password" placeholder="password" />
+                                <input  type="password" 
+                                        class="form-control" 
+                                        id="password" 
+                                        name="passwordInput"
+                                        onChange={(e)=>props.handleChange(e)} 
+                                        required/>
                             </div>
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">register</button>
+                                <button id="register-btn" type="submit" class="btn btn-primary">register</button>
                             </div>
                         </form>
                     </div>

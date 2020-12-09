@@ -1,8 +1,8 @@
-//const db = require("mongoose")
-const { Schema } = mongoose;
+const mongoose = require("mongoose")
+const { Schema } = require("mongoose")
 ObjectId = Schema.Types.ObjectId
 
-const schema = new mongoose.schema({
+const schema = new Schema({
     user_id: ObjectId,
     title: String,
     text: String,
