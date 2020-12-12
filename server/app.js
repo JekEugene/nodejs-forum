@@ -30,9 +30,9 @@ app.use((req, res, next) => {
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
-app.use("/", authenticateToken, refreshToken, homeRouter)
-app.use("/user", authenticateToken, refreshToken, userRouter)
-app.use("/post", authenticateToken, refreshToken, postRouter)
+app.use("/", authenticateToken, homeRouter)
+app.use("/user", authenticateToken, userRouter)
+app.use("/post",   postRouter)
 
 async function start(){
     app.listen(process.env.PORT)

@@ -2,7 +2,7 @@ import Login from "../login/login"
 import Register from "../register/register"
 import Logout from "../logout/logout"
 import React, {Component} from 'react'
-import {Link} from 'react-router-dom'
+import {Link, NavLink} from 'react-router-dom'
 import "./header.css"
   
 function Header(props) {
@@ -19,12 +19,15 @@ function Header(props) {
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
+                        <NavLink to="/">
+                            <p class="nav-link">Home</p>
+                        </NavLink>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/post/add">Add Post</a>
+                        <NavLink to="/post/add">
+                            <p class="nav-link">Add Post</p>
+                        </NavLink>
                     </li>
-                    
                 </ul>
                 <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

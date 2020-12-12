@@ -1,49 +1,36 @@
 const jwt = require("jsonwebtoken")
-const Token = require("../models/tokens")
+const User = require("../models/users")
 
 module.exports = function(req, res, next) {
-    console.log("1")
-    if(req.redirect){
-        console.log("2")
-        const redirect = req.redirect
-        const token = req.cookies.refreshToken
-        jwt.verify(token, process.env.REFRESH_SECRET_TOKEN, async (err, user) => {
-            if(err) return res.redirect("/")
-            Token.findOne({user_id: user.id}, (err, userTokens)=>{
-                if(err || userTokens===null){
-                    console.log("3")
-                    tokens = {
-                        accessToken: '',
-                        refreshToken: ''
-                    }
-                    req.redirect = ""
-                    return res.status(200).json(Object.assign({role: 0, name: "guest"}, tokens))
+    console.log("red")
+    const token = req.cookies.refreshToken
+    jwt.verify(token, process.env.REFRESH_SECRET_TOKEN, async (err, user) => {
+        if(err) return res.json({role: 0, name: "guest"})
+        User.findOne({_id: user.id}, (err, userTokens)=>{
+            if(err || userTokens===null){
+                res.clearCookie("accessToken")
+                res.clearCookie("refreshToken")
+                return res.status(401).json(Object.assign({role: 0, name: "guest"}, tokens))
+            }
+            if(userTokens.token.includes(token)) {
+                const refreshUser = {
+                    id: user.id,
+                    name: user.name,
+                    role: user.role
                 }
-                console.log(user)
-                if(userTokens.token.includes(token)) {
-                    newUser = {
-                        name: user.name,
-                        id: user.id,
-                        role: user.role
-                    }
-                    const accessToken = jwt.sign(newUser, process.env.ACCESS_SECRET_TOKEN, { expiresIn: "15s" })
-                    const refreshToken = jwt.sign(newUser, process.env.REFRESH_SECRET_TOKEN, { expiresIn: "7d" })
-                    const tokens = {
-                        accessToken,
-                        refreshToken
-                    }
-                    return res.json(Object.assign(user, tokens))
-                } else {
-                    console.log("5")
-                    tokens = {
-                        accessToken: '',
-                        refreshToken: ''
-                    }
-                    res.status(403).json(Object.assign(user, tokens))
-                }
-            })
+                const accessToken = jwt.sign(refreshUser, process.env.ACCESS_SECRET_TOKEN, { expiresIn: "15s" })
+                const refreshToken = jwt.sign(refreshUser, process.env.REFRESH_SECRET_TOKEN, { expiresIn: "7d" })
+                console.log("bang1")
+                res.cookie("accessToken", `${accessToken}`)
+                res.cookie("refreshToken", `${refreshToken}`)
+                req.user = refreshUser
+                console.log("bang2")
+                next()
+            } else {
+                res.clearCookie("accessToken")
+                res.clearCookie("refreshToken")
+                return res.status(403).json(Object.assign({name: "guest", role: 0}))
+            }
         })
-    } else {
-        next()
-    }
+    })
 }

@@ -12,7 +12,8 @@ import { ForumServiceProvider } from '../forum-service-context/forum-service-con
 import {
   HomePage,
   UserPage,
-  PostPage, } from '../pages';
+  PostPage,
+  AddPostPage } from '../pages';
 export default class App extends Component {
 
   constructor(props){
@@ -25,7 +26,7 @@ export default class App extends Component {
         id: null,
         name: '',
         email: '',
-        role: 0,
+        role: 1,
         inputName: '',
         inputEmail: '',
         inputPassword: '',
@@ -33,6 +34,7 @@ export default class App extends Component {
   }
 
   alertCreate = (text, type) => {
+    console.log("alert")
     this.setState({
         alert: true,
         alertMsg: text,
@@ -77,14 +79,13 @@ export default class App extends Component {
     }
     let res = await fetch('http://localhost:4000/login', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
         },
         body: JSON.stringify(user)
     });
     const result = await res.json()
-    document.cookie = `accessToken=${result.accessToken}`
-    document.cookie = `refreshToken=${result.refreshToken}`
     this.alertCreate(result.msg, result.type)
     if(result.type === "hide"){
       this.setState({
@@ -102,29 +103,20 @@ export default class App extends Component {
         credentials: 'include',
     });
     const result = await res.json()
+    console.log("login "+result.role)
     this.setState({
       name: result.name,
       role: result.role
     })
-    document.cookie = `accessToken=`
-    document.cookie = `refreshToken=`
   }
 
   componentDidMount = async () => {
-    console.log("gg")
-    //try {
-      const res = await fetch('http://localhost:4000/', {
-      method: "GET",
-      credentials: 'include',
-      //mode: 'cors',
+    try {
+      const res = await fetch('http://localhost:4000', {
+        method: "GET",
+        credentials: 'include',
       })
       const result = await res.json()
-      
-      console.log(result)
-      if(result.accessToken=="" && result.refreshToken==""){
-        document.cookie = `accessToken=${result.accessToken}`
-        document.cookie = `refreshToken=${result.refreshToken}`
-      }
       if(result.role === 0){
         this.setState({
           name: result.name,
@@ -137,15 +129,9 @@ export default class App extends Component {
           role: result.role
         })
       }
-    // } catch (err) {
-    //   console.log(err)
-    // }
-    // const res1 = await fetch('http://localhost:4000/', {
-    //   method: "GET",
-    //   credentials: 'include',
-    //   //mode: 'cors',
-    // })
-    
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   render() {
@@ -153,7 +139,6 @@ export default class App extends Component {
     console.log("role: " + this.state.role)
     return (
       <ForumServiceProvider value={this.state.forumService} >
-        
          <Router>
            <div className="container">
               {alert === true ? <Alert 
@@ -182,10 +167,15 @@ export default class App extends Component {
                 logoutSubmit={this.logoutSubmit}
                 id={this.state.id}/>
                 
-              
               <Switch>
                 <Route path="/" exact component={HomePage} />
                 <Route path="/user/:id" component={UserPage} />
+                <Route path="/post/add" exact render={
+                  ()=><AddPostPage 
+                          id={this.state.id}
+                          role={this.state.role}
+                          alertCreate={(text, type)=>this.alertCreate(text, type)}/>
+                }/>
                 <Route path="/post/:id" component={PostPage} />
 
                 <Route render={() => <h2>Page not found</h2>} />

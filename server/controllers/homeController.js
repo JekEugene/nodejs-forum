@@ -1,50 +1,23 @@
 const User = require("../models/users")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
-const Token = require("../models/tokens")
-
 
 exports.homePage = function(req, res) {
-    const user = req.user
-    console.log("hi")
-    res.status(200).json(user)
-}
-
-exports.refreshToken = function(req, res) {
-    console.log("1")
-    if(req.redirect){
-        console.log("2")
-        const token = req.cookies.refreshToken
-        jwt.verify(token, process.env.ACCESS_SECRET_TOKEN, async (err, user) => {
-            if(err) return res.redirect("/")
-            const userTokens = await Token.findOne({id: user.id})
-            if(userTokens.token.includes(token)) {
-                const accessToken = jwt.sign(user, process.env.ACCESS_SECRET_TOKEN, { expiresIn: "15s" })
-                const refreshToken = jwt.sign(user, process.env.REFRESH_SECRET_TOKEN, { expiresIn: "7d" })
-                const tokens = {
-                    accessToken,
-                    refreshToken
-                }
-                return res.json(Object.assign(user, tokens))
-            } else {
-                console.log("3")
-                tokens = {
-                    accessToken: '',
-                    refreshToken: ''
-                }
-                res.status(403).json(Object.assign(user, tokens))
-            }
-        })
+    if(req.user){
+        const user = req.user
+        return res.status(200).json(user)
     } else {
-        console.log("4")
-        res.redirect("/")
+        return res.status(200).json({name: "guest", role: 0})
     }
+    
 }
 
 exports.login = async function(req, res){
+    console.log("log1")
     try {
         const {email, password} = req.body
         const candidate = await User.findOne({email: email})
+        console.log("log2")
         if (candidate) {
             const areSame = await bcrypt.compare(password, candidate.password)
             if (areSame) {
@@ -53,24 +26,19 @@ exports.login = async function(req, res){
                     id: candidate._id,
                     role: candidate.role
                 }
+                console.log("log3")
                 const accessToken = jwt.sign(user, process.env.ACCESS_SECRET_TOKEN, { expiresIn: "15s" })
                 const refreshToken = jwt.sign(user, process.env.REFRESH_SECRET_TOKEN, { expiresIn: "7d" })
-                //{ maxAge: 900000, httpOnly: true }
-                const tokens = {
-                    accessToken,
-                    refreshToken
-                }
+                console.log(accessToken)
+                console.log(refreshToken)
+                res.cookie("accessToken", `${accessToken}`,{maxAge: 1000 * 15, httpOnly: true})
+                res.cookie("refreshToken", `${refreshToken}`, {maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true})
                 
-                Token.findOne({user_id: user.id}, async (err, findUser)=>{
-                    if(findUser===null){
-                        const newUser = await Token.create({user_id: user.id})
-                        newUser.token.push(refreshToken)
-                        newUser.save()
-                        return res.json(Object.assign(user, tokens, {msg: "", type: "hide"}))
-                    }
+                User.findOne({_id: user.id}, async (err, findUser)=>{
                     findUser.token.push(refreshToken)
                     findUser.save()
-                    return res.json(Object.assign(user, tokens, {msg: "", type: "hide"}))
+                    console.log("log4")
+                    return res.json(Object.assign(user, {msg: "", type: "hide"}))
                 })
             } else {
                 return res.status(403).json(Object.assign( req.user, {msg: "wrong email or password1", type: "error"}))
@@ -79,7 +47,7 @@ exports.login = async function(req, res){
             return res.status(403).json(Object.assign( req.user, {msg: "wrong email or password2", type: "error"}))
         }
     } catch (e) {
-    console.log(e)
+        console.log(e)
     }
 }
 
@@ -109,15 +77,22 @@ exports.register = async function(req, res){
 }
 
 exports.logout = async function(req, res){
+    console.log("logout")
     const token = req.cookies.refreshToken
+    res.clearCookie("accessToken")
+    res.clearCookie("refreshToken")
     jwt.verify(token, process.env.ACCESS_SECRET_TOKEN, async (err, user) => {
         if(err){
             return res.json({name: "guest", role: 0})
         }
-        user.token.filter((el)=>{
+        const userTokens = await User.find({_id: user.id})
+        const tokens = userTokens.token
+        tokens.filter((el)=>{
             if(token === el) return false
             return true
         })
+        userTokens.token = tokens
+        await userTokens.save()
         return res.json({name: "guest", role: 0})
     })
 }

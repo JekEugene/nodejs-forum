@@ -4,6 +4,7 @@ ObjectId = Schema.Types.ObjectId
 
 const schema = new Schema({
     user_id: ObjectId,
+    user_name: String,
     title: String,
     text: String,
     comments: Number,
@@ -12,6 +13,6 @@ const schema = new Schema({
     date: Date,
 })
 
-const comment = mongoose.model('comments', schema);
+const Post = mongoose.model('posts', schema);
 
-module.exports = comment
+module.exports = Post

@@ -7,6 +7,7 @@ const schema = new Schema({
     role: String,
     name: String,
     rating: Number,
+    token: [String]
 })
 
 const User = mongoose.model('users', schema);
