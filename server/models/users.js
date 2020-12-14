@@ -4,9 +4,9 @@ const { Schema } = require("mongoose")
 const schema = new Schema({
     email: String,
     password: String,
-    role: String,
+    role: Number,
     name: String,
-    rating: Number,
+    date: Date,
     token: [String]
 })
 

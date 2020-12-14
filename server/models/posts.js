@@ -7,9 +7,6 @@ const schema = new Schema({
     user_name: String,
     title: String,
     text: String,
-    comments: Number,
-    likes: Number,
-    dislikes: Number,
     date: Date,
 })
 

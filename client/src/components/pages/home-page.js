@@ -13,13 +13,10 @@ export default class HomePage extends Component {
   componentDidMount = async () => {
       const res = await fetch('http://localhost:4000/post/get')
       const result = await res.json()
-      console.log(result)
       const posts = result
-      console.log(posts)
       this.setState({
           posts,
       })
-      console.log(this.state.posts)
   }
 
   render(){
@@ -50,19 +47,23 @@ export default class HomePage extends Component {
       second: 'numeric'
     }
     const posts = this.state.posts.map((post)=>{
-    return  <><div className="row">
-                <div className="col-md-1"></div>
-                <div className="col-sm-12 col-md-10">
-                  <p><strong>{post.user_name}</strong> {new Date(post.date).toLocaleString("en-US", options)}</p>
-                  <h3>{post.title} </h3>
-                  <p>{post.text.slice(0, 500)+"..."}</p>
-                  <Link to={`/post/${post._id}`}>
-                    <button className="btn btn-secondary">Read more</button>
-                  </Link>
+      return  <><div className="row">
+                  <div className="col-md-1"></div>
+                  <div className="col-sm-12 col-md-10">
+                    <p><Link to={`/user/${post.user_id}`}>
+                      <strong>{post.user_name}</strong>
+                      </Link> 
+                      {new Date(post.date).toLocaleString("en-US", options)}
+                    </p>
+                    <h3>{post.title} </h3>
+                    <p>{post.text+"..."}</p>
+                    <Link to={`/post/${post._id}`}>
+                      <button className="btn btn-secondary">Read more</button>
+                    </Link>
+                  </div>
                 </div>
-              </div>
-              <hr />
-            </>
+                <hr />
+              </>
     })
     return(
       <div className="jumbotron">

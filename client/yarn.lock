@@ -3187,6 +3187,11 @@
   "resolved" "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz"
   "version" "1.0.0"
 
+"bootstrap-icons@^1.2.1":
+  "integrity" "sha512-c63G57gFN9Yz1Dmi1RRpBd+cm/Lil31nRsnYxX8VeC/2wTk1Z54OU4twyLAVpgj2lX2lyHx0M8+xhEdkr79RAg=="
+  "resolved" "https://registry.npmjs.org/bootstrap-icons/-/bootstrap-icons-1.2.1.tgz"
+  "version" "1.2.1"
+
 "brace-expansion@^1.1.7":
   "integrity" "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA=="
   "resolved" "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.11.tgz"

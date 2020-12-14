@@ -1,12 +1,10 @@
 import React, {Component} from 'react'
-import ReactDOM from 'react-dom'
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
 
 import RegisterModal from "../register-modal/register-modal"
 import LoginModal from "../login-modal/login-modal"
 import Header from '../header/header'
 import Alert from "../alert/alert"
-import ForumService from '../../service/forum-service'
 import { ForumServiceProvider } from '../forum-service-context/forum-service-context';
 
 import {
@@ -22,11 +20,10 @@ export default class App extends Component {
         alert: false,
         alertMsg: '',
         alertType: '',
-        forumService: new ForumService(),
         id: null,
         name: '',
         email: '',
-        role: 1,
+        role: 0,
         inputName: '',
         inputEmail: '',
         inputPassword: '',
@@ -103,7 +100,6 @@ export default class App extends Component {
         credentials: 'include',
     });
     const result = await res.json()
-    console.log("login "+result.role)
     this.setState({
       name: result.name,
       role: result.role
@@ -138,6 +134,7 @@ export default class App extends Component {
     const alert = this.state.alert
     console.log("role: " + this.state.role)
     return (
+      
       <ForumServiceProvider value={this.state.forumService} >
          <Router>
            <div className="container">
@@ -158,7 +155,6 @@ export default class App extends Component {
                 inputEmail={this.state.inputEmail}
                 inputPassword={this.state.inputPassword}
                 />  
-              
               <Header 
                 name={this.state.name}
                 rating={this.state.rating}
@@ -166,17 +162,26 @@ export default class App extends Component {
                 role={this.state.role}
                 logoutSubmit={this.logoutSubmit}
                 id={this.state.id}/>
-                
               <Switch>
                 <Route path="/" exact component={HomePage} />
-                <Route path="/user/:id" component={UserPage} />
+                <Route path="/user/:id" render={
+                  ()=><UserPage 
+                          user_id={this.state.id}
+                          role={this.state.role}
+                          name={this.state.name}/>
+                }/> />
                 <Route path="/post/add" exact render={
                   ()=><AddPostPage 
                           id={this.state.id}
                           role={this.state.role}
                           alertCreate={(text, type)=>this.alertCreate(text, type)}/>
                 }/>
-                <Route path="/post/:id" component={PostPage} />
+                <Route path="/post/:id" render={
+                  ()=><PostPage 
+                          user_id={this.state.id}
+                          role={this.state.role}
+                          name={this.state.name}/>
+                }/>
 
                 <Route render={() => <h2>Page not found</h2>} />
               </Switch>

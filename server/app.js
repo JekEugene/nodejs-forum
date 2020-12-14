@@ -1,8 +1,7 @@
 const express = require("express")
-const db = require("./config/database")
 const app = express()
+const db = require("./config/database")
 const bodyParser = require('body-parser')
-const jwt = require("jsonwebtoken")
 const cookieParser = require('cookie-parser'); 
 
 app.use(cookieParser()); 
@@ -11,7 +10,6 @@ const userRouter = require("./routes/userRouter")
 const postRouter = require("./routes/postRouter")
 
 const authenticateToken = require("./middleware/authenticateToken")
-const refreshToken = require("./middleware/refreshToken")
 
 require("dotenv").config();
 
@@ -31,8 +29,8 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
 app.use("/", authenticateToken, homeRouter)
-app.use("/user", authenticateToken, userRouter)
-app.use("/post",   postRouter)
+app.use("/user", userRouter)
+app.use("/post", postRouter)
 
 async function start(){
     app.listen(process.env.PORT)

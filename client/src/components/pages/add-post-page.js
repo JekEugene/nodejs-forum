@@ -7,18 +7,15 @@ export default class AddPostPage extends Component {
     this.state = {
       title: "",
       text: "",
-
     }
   }
 
   handleChange = (e) => {
-    console.log([e.target.name] + ":"+ e.target.value)
     this.setState({[e.target.name]: e.target.value})
   }
 
   addPostSubmit = async (e) => {
     e.preventDefault()
-    console.log("submit")
     const post = {
       title: this.state.title,
       text: this.state.text
@@ -27,7 +24,6 @@ export default class AddPostPage extends Component {
       title: "",
       text: ""
     })
-    console.log("submit2")
     let res = await fetch('http://localhost:4000/post/add', {
         method: 'POST',
         credentials: 'include',
@@ -37,7 +33,7 @@ export default class AddPostPage extends Component {
         body: JSON.stringify(post)
     });
     const result = await res.json()
-    this.props.alertCreate(result.text, result.type)
+    this.props.alertCreate(result.msg, result.type)
   }
 
   render(){

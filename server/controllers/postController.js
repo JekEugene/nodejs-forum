@@ -1,13 +1,9 @@
 const Post = require("../models/posts")
+const Comment = require("../models/comments")
 
 exports.postPage = async function(req, res) {
-    console.log("param "+req.params.id)
-    const post = await Post.findOne({_id: req.params.id},(err)=>{if(err)console.log(err)})
+    const post = await Post.findById(req.params.id, (err)=>{if(err)console.log(err)})
     res.status(200).json(post)
-}
-
-exports.addPostPage = function(req, res) {
-
 }
 
 exports.getPosts = async function(req, res) {
@@ -23,7 +19,6 @@ exports.getPosts = async function(req, res) {
 }
 
 exports.addPost = async function(req, res) {
-    console.log("role: "+req.user.role)
     if(req.user.role >= 1){
         const {title, text} = req.body
         Post.create({
@@ -48,19 +43,47 @@ exports.addPost = async function(req, res) {
 }
 
 exports.getComments = async function(req, res) {
-    console.log("param "+req.params.id)
-    const post = await Post.findOne({_id: req.params.id},(err)=>{if(err)console.log(err)})
-    res.status(200).json(post)
-}
-
-exports.deletePost = function(req, res) {
-    
+    const comments = await Comment.find({post_id: req.params.id},(err)=>{if(err)console.log(err)})
+    res.status(200).json(comments)
 }
 
 exports.addComment = function(req, res) {
+    if(req.user.role >= 1){
+        const {commentText, post_id} = req.body
+        Comment.create({
+            post_id,
+            user_id: req.user.id,
+            user_name: req.user.name,
+            text: commentText,
+            likes: 0,
+            dislikes: 0,
+            date: Date.now(),
+        })
+        res.status(200).json({msg: "the comment was sent", type: "success"})
+    } else {
+        res.status(403).json({msg: "You don't have permission to send comment", type: "error"})
+    }
     
 }
 
-exports.deleteComment = function(req, res) {
-    
+exports.deleteComment = async function(req, res) {
+    const comment_id = req.body.comment_id
+    const comment = await Comment.findOne({_id: comment_id})
+    if(comment.user_id == req.user.id || req.user.role == 2){
+        await Comment.deleteOne({_id: comment_id})
+        return res.status(200).json({msg: "Comment deleted", type: "success"})
+    } else {
+        return res.status(403).json({msg: "Cannot delete comment", type: "error"})
+    }
+}
+
+exports.deletePost = async function(req, res) {
+    const post_id = req.body.post_id
+    const post = await Post.findOne({_id: post_id})
+    if(post.user_id == req.user.id || req.user.role == 2){
+        await Post.deleteOne({_id: post_id})
+        return res.status(200).json({msg: "Post deleted", type: "success"})
+    } else {
+        return res.status(403).json({msg: "Cannot delete post", type: "error"})
+    }
 }
