@@ -1,17 +1,15 @@
-//const db = require("mongoose")
-const { Schema } = mongoose;
+const mongoose = require("mongoose")
+const { Schema } = require("mongoose")
 ObjectId = Schema.Types.ObjectId
 
-const schema = new mongoose.schema({
+const schema = new Schema({
     user_id: ObjectId,
+    user_name: String,
     title: String,
     text: String,
-    comments: Number,
-    likes: Number,
-    dislikes: Number,
     date: Date,
 })
 
-const comment = mongoose.model('comments', schema);
+const Post = mongoose.model('posts', schema);
 
-module.exports = comment
+module.exports = Post
